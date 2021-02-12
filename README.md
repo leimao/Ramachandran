@@ -26,6 +26,7 @@ $ docker run -it --rm --gpus device=0 -v $(pwd):/mnt ramachandran:0.0.1
 
 ## TODOs
 
+- [ ] Add PDB crawling tool to compute the favorable and acceptable regions.
 - [ ] Add favorable and acceptable regions to the plot.
 - [ ] Add mixture of Gaussians for visualizing the clusters of the dihedral angles.
 - [ ] Allow the user to show residue name and number in the plot.

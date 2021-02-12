@@ -61,15 +61,16 @@ def create_ramachandran_plot(pdb_filepath: str, plot_filepath: str, protein_name
     ax.xaxis.set_major_locator(ticker.MultipleLocator(45))
     ax.yaxis.set_major_locator(ticker.MultipleLocator(45))
 
-    ax.grid(linestyle='--')
+    ax.plot([-180,180], [0,0], "--", linewidth=0.5, color="black")
+    ax.plot([0,0], [-180,180], "--", linewidth=0.5, color="black")
 
 
-    ax.set_xlabel(r'${\phi}$', fontsize=16, fontweight='bold')
-    ax.set_ylabel(r'${\psi}$', fontsize=16, fontweight='bold')
+    ax.set_xlabel(r"${\phi}$", fontsize=16, fontweight="bold")
+    ax.set_ylabel(r"${\psi}$", fontsize=16, fontweight="bold")
 
 
     # ax.legend()
-    fig.savefig(plot_filepath, format='svg', dpi=600, bbox_inches='tight')
+    fig.savefig(plot_filepath, format="svg", dpi=600, bbox_inches="tight")
     plt.close()
             
 
