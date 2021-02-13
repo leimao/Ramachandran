@@ -5,61 +5,60 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+from matplotlib import cm
+import matplotlib.colors as mplcolors
 from ramachandran.read_structure import read_pdb, read_pdbx
-from ramachandran.compute_dihedral_angle import protein_backbone_dihedral_angle_phi, protein_backbone_dihedral_angle_psi
+from ramachandran.compute_dihedral_angle import protein_backbone_dihedral_angle_phi, protein_backbone_dihedral_angle_psi, collect_dihedral_angles
+
+def create_ramachandran_trusted_regsion_plot(trusted_regsion_filepath: str, plot_filepath: str) -> None:
+
+    npzfile = np.load(trusted_regsion_filepath)
+
+    counts_density = npzfile["density_map"]
+
+    print(np.sum(counts_density))
 
 
-def collect_dihedral_angles(filepath: str) -> List[Tuple[float, float]]:
+    cmap = mplcolors.ListedColormap(['#FFFFFF', '#B3E8FF', '#7FD9FF'])
 
-    _, file_extension = os.path.splitext(filepath)
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.add_subplot(111)
+    ax.imshow(np.rot90(counts_density), cmap=cmap, norm=mplcolors.BoundaryNorm([0, 5e-7, 2e-5, 1], cmap.N), origin="upper", extent=(-180, 180, -180, 180))
 
-    if file_extension == ".pdb":
-        protein = read_pdb(pdb_filepath=filepath)
-    elif file_extension == ".cif":
-        protein = read_pdbx(pdbx_filepath=filepath)
-    else:
-        raise RuntimeError("Only files with extensions of pdb and cif are supported.")
+    ax.set_xlim(-180, 180)
+    ax.set_ylim(-180, 180)
 
-    dihedrals = []
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(45))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(45))
 
-    for chain_identifier in protein:
-        chain = protein[chain_identifier]
-        for residue_sequence_number in chain:
-            residue = chain[residue_sequence_number]
-            # Skip the first, the last, and problematic residues
-            if residue_sequence_number - 1 not in chain or residue_sequence_number + 1 not in chain:
-                continue
-            last_residue = chain[residue_sequence_number - 1]
-            next_residue = chain[residue_sequence_number + 1]
-            n = residue["N"]
-            c_alpha = residue["CA"]
-            c = residue["C"]
-            c_minus = last_residue["C"]
-            n_plus = next_residue["N"]
+    ax.plot([-180, 180], [0, 0], "--", linewidth=0.5, color="black")
+    ax.plot([0, 0], [-180, 180], "--", linewidth=0.5, color="black")
 
-            phi = protein_backbone_dihedral_angle_phi(c_minus=c_minus, n=n, c_alpha=c_alpha, c=c)
-            psi = protein_backbone_dihedral_angle_psi(n=n, c_alpha=c_alpha, c=c, n_plus=n_plus)
+    ax.set_xlabel(r"${\phi}$", fontsize=16, fontweight="bold")
+    ax.set_ylabel(r"${\psi}$", fontsize=16, fontweight="bold")
 
-            phi = np.rad2deg(phi)
-            psi = np.rad2deg(psi)
-
-            dihedrals.append((phi, psi))
-    
-    return dihedrals
+    fig.savefig(plot_filepath, format="svg", dpi=600, bbox_inches="tight")
+    plt.close()
 
 
-def create_ramachandran_plot(filepath: str, plot_filepath: str, protein_name: Optional[str] = None) -> None:
+    return
 
-    dihedrals = collect_dihedral_angles(filepath=filepath)
+
+
+def create_ramachandran_plot(filepath: str,
+                             plot_filepath: str,
+                             protein_name: Optional[str] = None) -> None:
+
+    dihedral_angles = collect_dihedral_angles(filepath=filepath)
 
     x = []
     y = []
 
-    for phi, psi in dihedrals:
+    for phi, psi in dihedral_angles:
         x.append(phi)
         y.append(psi)
 
-    fig = plt.figure(figsize=(10,10))
+    fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111)
     ax.scatter(x, y, s=10)
 
@@ -69,15 +68,13 @@ def create_ramachandran_plot(filepath: str, plot_filepath: str, protein_name: Op
     ax.xaxis.set_major_locator(ticker.MultipleLocator(45))
     ax.yaxis.set_major_locator(ticker.MultipleLocator(45))
 
-    ax.plot([-180,180], [0,0], "--", linewidth=0.5, color="black")
-    ax.plot([0,0], [-180,180], "--", linewidth=0.5, color="black")
-
+    ax.plot([-180, 180], [0, 0], "--", linewidth=0.5, color="black")
+    ax.plot([0, 0], [-180, 180], "--", linewidth=0.5, color="black")
 
     ax.set_xlabel(r"${\phi}$", fontsize=16, fontweight="bold")
     ax.set_ylabel(r"${\psi}$", fontsize=16, fontweight="bold")
 
     fig.savefig(plot_filepath, format="svg", dpi=600, bbox_inches="tight")
     plt.close()
-            
 
     return

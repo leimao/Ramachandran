@@ -1,7 +1,7 @@
 import setuptools
 
 with open("README.md", "r") as fhand:
-    long_description = fhand.read()
+  long_description = fhand.read()
 
 setuptools.setup(
     name="ramachandran",
