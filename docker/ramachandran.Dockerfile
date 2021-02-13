@@ -29,4 +29,4 @@ ENV LC_ALL en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 
-RUN pip install numpy==1.20.1 matplotlib==3.3.4 aiohttp==3.7.3
+RUN pip install numpy==1.20.1 matplotlib==3.3.4 aiohttp==3.7.3 requests==2.25.1 tqdm==4.56.2

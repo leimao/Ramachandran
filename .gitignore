@@ -1,3 +1,6 @@
 .vscode
 __pycache__
 ramachandran.egg-info
+pdb_collections
+pdbx_collections
+pdbx_collections*

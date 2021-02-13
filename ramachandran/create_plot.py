@@ -1,16 +1,24 @@
 from typing import List, Tuple, Optional
+import os
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-from ramachandran.read_pdb import read_protein
+from ramachandran.read_structure import read_pdb, read_pdbx
 from ramachandran.compute_dihedral_angle import protein_backbone_dihedral_angle_phi, protein_backbone_dihedral_angle_psi
 
 
-def collect_dihedral_angles(pdb_filepath: str) -> List[Tuple[float, float]]:
+def collect_dihedral_angles(filepath: str) -> List[Tuple[float, float]]:
 
-    protein = read_protein(pdb_filepath=pdb_filepath)
+    _, file_extension = os.path.splitext(filepath)
+
+    if file_extension == ".pdb":
+        protein = read_pdb(pdb_filepath=filepath)
+    elif file_extension == ".cif":
+        protein = read_pdbx(pdbx_filepath=filepath)
+    else:
+        raise RuntimeError("Only files with extensions of pdb and cif are supported.")
 
     dihedrals = []
 
@@ -40,9 +48,9 @@ def collect_dihedral_angles(pdb_filepath: str) -> List[Tuple[float, float]]:
     return dihedrals
 
 
-def create_ramachandran_plot(pdb_filepath: str, plot_filepath: str, protein_name: Optional[str] = None) -> None:
+def create_ramachandran_plot(filepath: str, plot_filepath: str, protein_name: Optional[str] = None) -> None:
 
-    dihedrals = collect_dihedral_angles(pdb_filepath=pdb_filepath)
+    dihedrals = collect_dihedral_angles(filepath=filepath)
 
     x = []
     y = []
@@ -68,8 +76,6 @@ def create_ramachandran_plot(pdb_filepath: str, plot_filepath: str, protein_name
     ax.set_xlabel(r"${\phi}$", fontsize=16, fontweight="bold")
     ax.set_ylabel(r"${\psi}$", fontsize=16, fontweight="bold")
 
-
-    # ax.legend()
     fig.savefig(plot_filepath, format="svg", dpi=600, bbox_inches="tight")
     plt.close()
             
