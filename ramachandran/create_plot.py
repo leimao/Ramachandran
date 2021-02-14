@@ -8,22 +8,27 @@ import matplotlib.ticker as ticker
 from matplotlib import cm
 import matplotlib.colors as mplcolors
 from ramachandran.read_structure import read_pdb, read_pdbx
-from ramachandran.compute_dihedral_angle import protein_backbone_dihedral_angle_phi, protein_backbone_dihedral_angle_psi, collect_dihedral_angles
+from ramachandran.compute_dihedral_angle import protein_backbone_dihedral_angle_phi, protein_backbone_dihedral_angle_psi, collect_categorized_dihedral_angles
 
 def create_ramachandran_trusted_regsion_plot(trusted_regsion_filepath: str, plot_filepath: str) -> None:
 
     npzfile = np.load(trusted_regsion_filepath)
 
-    counts_density = npzfile["density_map"]
+    gaussian_density_gly = npzfile["gaussian_density_gly"]
+    gaussian_density_pro = npzfile["gaussian_density_pro"]
+    gaussian_density_prepro = npzfile["gaussian_density_prepro"]
+    gaussian_density_general = npzfile["gaussian_density_general"]
 
-    print(np.sum(counts_density))
+    #print(np.sum(counts_density))
 
+    percentile_90 = np.percentile(gaussian_density_general, 90)
+    percentile_15 = np.percentile(gaussian_density_general, 15)
 
     cmap = mplcolors.ListedColormap(['#FFFFFF', '#B3E8FF', '#7FD9FF'])
 
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111)
-    ax.imshow(np.rot90(counts_density), cmap=cmap, norm=mplcolors.BoundaryNorm([0, 5e-7, 2e-5, 1], cmap.N), origin="upper", extent=(-180, 180, -180, 180))
+    ax.imshow(np.rot90(gaussian_density_general), interpolation="bilinear", cmap=cmap, norm=mplcolors.BoundaryNorm(boundaries=[0, percentile_15, percentile_90, 1], ncolors=cmap.N), origin="upper", extent=(-180, 180, -180, 180))
 
     ax.set_xlim(-180, 180)
     ax.set_ylim(-180, 180)
@@ -49,12 +54,19 @@ def create_ramachandran_plot(filepath: str,
                              plot_filepath: str,
                              protein_name: Optional[str] = None) -> None:
 
-    dihedral_angles = collect_dihedral_angles(filepath=filepath)
+    categorized_dihedral_angles = collect_categorized_dihedral_angles(filepath=filepath)
+
+    dihedral_angles_general = categorized_dihedral_angles.get_general()
+    dihedral_angles_gly = categorized_dihedral_angles.get_gly()
+    dihedral_angles_pro = categorized_dihedral_angles.get_pro()
+    dihedral_angles_prepro = categorized_dihedral_angles.get_prepro()
+
+    # print(len(dihedral_angles))
 
     x = []
     y = []
 
-    for phi, psi in dihedral_angles:
+    for phi, psi in dihedral_angles_general:
         x.append(phi)
         y.append(psi)
 

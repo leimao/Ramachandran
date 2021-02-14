@@ -1,3 +1,4 @@
+from __future__ import annotations
 from collections.abc import Sequence
 from typing import List, Tuple, Optional
 import os
@@ -88,30 +89,100 @@ def protein_backbone_dihedral_angle_psi(n: Sequence, c_alpha: Sequence,
 
     return angle
 
+class CategorizedDihedralAngles(object):
 
-def collect_dihedral_angles(filepath: str, b_factor_threshold: Optional[float] = None) -> List[Tuple[float, float]]:
+    def __init__(self, dihedral_angles_gly: List[Tuple[float, float]] = [], dihedral_angles_prepro: List[Tuple[float, float]] = [], dihedral_angles_pro: List[Tuple[float, float]] = [], dihedral_angles_general: List[Tuple[float, float]] = []) -> None:
+
+        self.dihedral_angles_gly = dihedral_angles_gly
+        self.dihedral_angles_prepro = dihedral_angles_prepro
+        self.dihedral_angles_pro = dihedral_angles_pro
+        # Not gly, pro, pre-pro
+        self.dihedral_angles_general = dihedral_angles_general
+    
+    def add_to_gly(self, dihedral_angles: List[Tuple[float, float]]) -> None:
+
+        self.dihedral_angles_gly.extend(dihedral_angles)
+
+    def add_to_prepro(self, dihedral_angles: List[Tuple[float, float]]) -> None:
+
+        self.dihedral_angles_prepro.extend(dihedral_angles)
+
+    def add_to_pro(self, dihedral_angles: List[Tuple[float, float]]) -> None:
+
+        self.dihedral_angles_pro.extend(dihedral_angles)
+
+    def add_to_general(self, dihedral_angles: List[Tuple[float, float]]) -> None:
+
+        self.dihedral_angles_general.extend(dihedral_angles)
+
+    def get_gly(self) -> List[Tuple[float, float]]:
+
+        return self.dihedral_angles_gly
+
+    def get_prepro(self) -> List[Tuple[float, float]]:
+
+        return self.dihedral_angles_prepro
+
+    def get_pro(self) -> List[Tuple[float, float]]:
+
+        return self.dihedral_angles_pro
+
+    def get_general(self) -> List[Tuple[float, float]]:
+
+        return self.dihedral_angles_general
+
+    # Override +  
+    def __add__(self, other: CategorizedDihedralAngles) -> CategorizedDihedralAngles:
+
+        return CategorizedDihedralAngles(dihedral_angles_gly=self.dihedral_angles_gly + other.dihedral_angles_gly, dihedral_angles_prepro=self.dihedral_angles_prepro + other.dihedral_angles_prepro, dihedral_angles_pro=self.dihedral_angles_pro + other.dihedral_angles_pro, dihedral_angles_general=self.dihedral_angles_general + other.dihedral_angles_general)
+    
+    # Override +=
+    def __iadd__(self, other: CategorizedDihedralAngles) -> CategorizedDihedralAngles:
+        
+        self.dihedral_angles_gly.extend(other.dihedral_angles_gly)
+        self.dihedral_angles_prepro.extend(other.dihedral_angles_prepro)
+        self.dihedral_angles_pro.extend(other.dihedral_angles_pro)
+        self.dihedral_angles_general.extend(other.dihedral_angles_general)
+
+        return self
+
+
+def collect_categorized_dihedral_angles(filepath: str, b_factor_threshold: Optional[float] = None) -> CategorizedDihedralAngles:
 
     _, file_extension = os.path.splitext(filepath)
+
+    # dihedral_angles = []
+
+    dihedral_angles_gly = []
+    dihedral_angles_pro = []
+    dihedral_angles_prepro = []
+    # Not gly, pro, pre-pro
+    dihedral_angles_general = []
+
+    categorized_dihedral_angles = CategorizedDihedralAngles()
+
+    #categorized_dihedral_angles = CategorizedDihedralAngles(dihedral_angles_gly=dihedral_angles_gly, dihedral_angles_pro=dihedral_angles_pro, dihedral_angles_prepro=dihedral_angles_prepro, dihedral_angles_general=dihedral_angles_general)
 
     if file_extension == ".pdb":
         protein = read_pdb(pdb_filepath=filepath)
     elif file_extension == ".cif":
         protein = read_pdbx(pdbx_filepath=filepath)
     else:
-        raise RuntimeError(
-            "Only files with extensions of pdb and cif are supported.")
-
-    dihedral_angles = []
+        print("Only files with extensions of pdb and cif are supported.")
+        #return categorized_dihedral_angles
 
     for chain_identifier in protein:
+
         chain = protein[chain_identifier]
         for residue_sequence_number in chain:
             residue = chain[residue_sequence_number]
+            residue_name = residue["residue"]
             # Skip the first, the last, and problematic residues
             if residue_sequence_number - 1 not in chain or residue_sequence_number + 1 not in chain:
                 continue
             last_residue = chain[residue_sequence_number - 1]
             next_residue = chain[residue_sequence_number + 1]
+            next_residue_name = next_residue["residue"]
 
             # Skip the residues that has missing information to compute dihedral angles
             if "N" not in residue or "CA" not in residue or "C" not in residue or "C" not in last_residue or "N" not in next_residue:
@@ -139,6 +210,19 @@ def collect_dihedral_angles(filepath: str, b_factor_threshold: Optional[float] =
             phi = np.rad2deg(phi)
             psi = np.rad2deg(psi)
 
-            dihedral_angles.append((phi, psi))
+            if residue_name == "GLY":
+                dihedral_angles_gly.append((phi, psi))
+            if residue_name == "PRO":
+                dihedral_angles_pro.append((phi, psi))
+            if next_residue_name == "PRO":
+                dihedral_angles_prepro.append((phi, psi))
+            if residue_name != "GLY" and residue_name != "PRO" and next_residue_name != "PRO":
+                dihedral_angles_general.append((phi, psi))
 
-    return dihedral_angles
+    # print(dihedral_angles_general)
+    categorized_dihedral_angles.add_to_gly(dihedral_angles_gly)
+    categorized_dihedral_angles.add_to_pro(dihedral_angles_pro)
+    categorized_dihedral_angles.add_to_prepro(dihedral_angles_prepro)
+    categorized_dihedral_angles.add_to_general(dihedral_angles_general)
+
+    return categorized_dihedral_angles

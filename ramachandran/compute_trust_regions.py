@@ -7,9 +7,9 @@ from functools import partial
 import numpy as np
 from scipy import stats
 from ramachandran.read_structure import read_pdb, read_pdbx
-from ramachandran.compute_dihedral_angle import protein_backbone_dihedral_angle_phi, protein_backbone_dihedral_angle_psi, collect_dihedral_angles
+from ramachandran.compute_dihedral_angle import CategorizedDihedralAngles, protein_backbone_dihedral_angle_phi, protein_backbone_dihedral_angle_psi, collect_categorized_dihedral_angles
 
-
+'''
 def count_dihedral_angles(dihedral_angles: List[Tuple[float, float]],
                           num_bins_per_dimension: int = 180) -> np.ndarray:
 
@@ -130,23 +130,23 @@ def count_dihedral_angles_from_directory(dir_path: str,
 
     return counts_density
 
-
+'''
 
 def collect_dihedral_angles_from_file(filepath: str,
                                     b_factor_threshold: float = 30
-                                    ) -> List[Tuple[float, float]]:
+                                    ) -> CategorizedDihedralAngles:
 
-    try:
-        dihedral_angles = collect_dihedral_angles(filepath=filepath, b_factor_threshold=b_factor_threshold)
-    except RuntimeError:
-        dihedral_angles = []
 
-    return dihedral_angles
+    categorized_dihedral_angles = collect_categorized_dihedral_angles(filepath=filepath, b_factor_threshold=b_factor_threshold)
+
+    # print(categorized_dihedral_angles.get_general())
+
+    return categorized_dihedral_angles
 
 
 def collect_dihedral_angles_from_files(filepaths: List[str],
                                      num_processes: int = 4,
-                                     b_factor_threshold: float = 30) -> List[Tuple[float, float]]:
+                                     b_factor_threshold: float = 30) -> CategorizedDihedralAngles:
 
     pool = Pool(processes=num_processes)
 
@@ -160,15 +160,16 @@ def collect_dihedral_angles_from_files(filepaths: List[str],
 
     pool.close()
 
-    dihedral_angles = []
-    for job in tqdm(jobs):
-        dihedral_angles += job.get()
+    categorized_dihedral_angles = CategorizedDihedralAngles()
 
-    return dihedral_angles
+    for job in tqdm(jobs):
+        categorized_dihedral_angles += job.get()
+
+    return categorized_dihedral_angles
 
 def collect_dihedral_angles_from_directory(dir_path: str,
                                          b_factor_threshold: float = 30,
-                                         num_processes: int = 4) -> List[Tuple[float, float]]:
+                                         num_processes: int = 4) -> CategorizedDihedralAngles:
 
     valid_structure_filepaths = []
 
@@ -181,9 +182,9 @@ def collect_dihedral_angles_from_directory(dir_path: str,
                                          or file_extension == ".cif"):
             valid_structure_filepaths.append(filepath)
 
-    dihedral_angles = collect_dihedral_angles_from_files(filepaths=valid_structure_filepaths, num_processes=num_processes, b_factor_threshold=b_factor_threshold)
+    categorized_dihedral_angles = collect_dihedral_angles_from_files(filepaths=valid_structure_filepaths, num_processes=num_processes, b_factor_threshold=b_factor_threshold)
 
-    return dihedral_angles
+    return categorized_dihedral_angles
 
 def compute_gaussian_kde_density(dihedral_angles: List[Tuple[float, float]], resolution: int = 180) -> np.ndarray:
 
@@ -205,24 +206,28 @@ def compute_gaussian_kde_density(dihedral_angles: List[Tuple[float, float]], res
 
     return Z
 
-def compute_gaussian_kde_density_from_directory(dir_path: str,
+def compute_gaussian_kde_densities_from_directory(dir_path: str,
                                          data_filepath: Optional[str] = None,
                                          b_factor_threshold: float = 30,
                                          resolution: int = 180,
-                                         num_processes: int = 4) -> np.ndarray:
+                                         num_processes: int = 4) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
 
 
-    dihedral_angles = collect_dihedral_angles_from_directory(dir_path=dir_path,
+    categorized_dihedral_angles = collect_dihedral_angles_from_directory(dir_path=dir_path,
                                          b_factor_threshold=b_factor_threshold,
                                          num_processes=num_processes)
 
     # Computing Gaussian KDE
     # This is a single-thread implementation and is somewhat slow.
     print("Computing Gaussian kernel, this might take a while...")
-    gaussian_density = compute_gaussian_kde_density(dihedral_angles=dihedral_angles, resolution=resolution)
+    
+    gaussian_density_gly = compute_gaussian_kde_density(dihedral_angles=categorized_dihedral_angles.get_gly(), resolution=resolution)
+    gaussian_density_pro = compute_gaussian_kde_density(dihedral_angles=categorized_dihedral_angles.get_pro(), resolution=resolution)
+    gaussian_density_prepro = compute_gaussian_kde_density(dihedral_angles=categorized_dihedral_angles.get_prepro(), resolution=resolution)
+    gaussian_density_general = compute_gaussian_kde_density(dihedral_angles=categorized_dihedral_angles.get_general(), resolution=resolution)
 
     if data_filepath is not None:
 
-        np.savez(data_filepath, density_map=gaussian_density)
+        np.savez(data_filepath, gaussian_density_gly=gaussian_density_gly, gaussian_density_pro=gaussian_density_pro, gaussian_density_prepro=gaussian_density_prepro, gaussian_density_general=gaussian_density_general)
 
-    return gaussian_density
+    return (gaussian_density_gly, gaussian_density_pro, gaussian_density_prepro, gaussian_density_general)
