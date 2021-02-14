@@ -19,16 +19,11 @@ def create_ramachandran_trusted_regsion_plot(trusted_regsion_filepath: str, plot
     gaussian_density_prepro = npzfile["gaussian_density_prepro"]
     gaussian_density_general = npzfile["gaussian_density_general"]
 
-    #print(np.sum(counts_density))
-
-    percentile_90 = np.percentile(gaussian_density_general, 90)
-    percentile_15 = np.percentile(gaussian_density_general, 15)
-
     cmap = mplcolors.ListedColormap(['#FFFFFF', '#B3E8FF', '#7FD9FF'])
 
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111)
-    ax.imshow(np.rot90(gaussian_density_general), interpolation="bilinear", cmap=cmap, norm=mplcolors.BoundaryNorm(boundaries=[0, percentile_15, percentile_90, 1], ncolors=cmap.N), origin="upper", extent=(-180, 180, -180, 180))
+    ax.imshow(np.rot90(gaussian_density_general), interpolation="bilinear", cmap=cmap, norm=mplcolors.BoundaryNorm(boundaries=[0, np.percentile(gaussian_density_general, 60), np.percentile(gaussian_density_general, 85), 1], ncolors=cmap.N), origin="upper", extent=(-180, 180, -180, 180))
 
     ax.set_xlim(-180, 180)
     ax.set_ylim(-180, 180)
@@ -60,6 +55,11 @@ def create_ramachandran_plot(filepath: str,
     dihedral_angles_gly = categorized_dihedral_angles.get_gly()
     dihedral_angles_pro = categorized_dihedral_angles.get_pro()
     dihedral_angles_prepro = categorized_dihedral_angles.get_prepro()
+
+    # print("-----------")
+    # print(len(dihedral_angles_general))
+    # print(len(dihedral_angles_gly))
+    # print("-----------")
 
     # print(len(dihedral_angles))
 

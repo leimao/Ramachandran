@@ -89,15 +89,27 @@ def protein_backbone_dihedral_angle_psi(n: Sequence, c_alpha: Sequence,
 
     return angle
 
-class CategorizedDihedralAngles(object):
+class CategorizedDihedralAngles:
 
-    def __init__(self, dihedral_angles_gly: List[Tuple[float, float]] = [], dihedral_angles_prepro: List[Tuple[float, float]] = [], dihedral_angles_pro: List[Tuple[float, float]] = [], dihedral_angles_general: List[Tuple[float, float]] = []) -> None:
+    def __init__(self, dihedral_angles_gly: Optional[List[Tuple[float, float]]] = None, dihedral_angles_prepro: Optional[List[Tuple[float, float]]] = None, dihedral_angles_pro: Optional[List[Tuple[float, float]]] = None, dihedral_angles_general: Optional[List[Tuple[float, float]]] = None) -> None:
 
-        self.dihedral_angles_gly = dihedral_angles_gly
-        self.dihedral_angles_prepro = dihedral_angles_prepro
-        self.dihedral_angles_pro = dihedral_angles_pro
+        if dihedral_angles_gly is None:
+            self.dihedral_angles_gly = []
+        else:
+            self.dihedral_angles_gly = dihedral_angles_gly
+        if dihedral_angles_prepro is None:
+            self.dihedral_angles_prepro = []
+        else:
+            self.dihedral_angles_prepro = dihedral_angles_prepro
+        if dihedral_angles_pro is None:
+            self.dihedral_angles_pro = []
+        else:
+            self.dihedral_angles_pro = dihedral_angles_pro
         # Not gly, pro, pre-pro
-        self.dihedral_angles_general = dihedral_angles_general
+        if dihedral_angles_general is None:
+            self.dihedral_angles_general = []
+        else:
+            self.dihedral_angles_general = dihedral_angles_general
     
     def add_to_gly(self, dihedral_angles: List[Tuple[float, float]]) -> None:
 
@@ -159,7 +171,17 @@ def collect_categorized_dihedral_angles(filepath: str, b_factor_threshold: Optio
     # Not gly, pro, pre-pro
     dihedral_angles_general = []
 
+    # categorized_dihedral_angles = CategorizedDihedralAngles(dihedral_angles_gly=dihedral_angles_gly, dihedral_angles_pro=dihedral_angles_pro, dihedral_angles_prepro=dihedral_angles_prepro, dihedral_angles_general=dihedral_angles_general)
+    #categorized_dihedral_angles = CategorizedDihedralAngles([],[],[],[])
     categorized_dihedral_angles = CategorizedDihedralAngles()
+    # print("~~~~~~~~~~~~~~~~")
+    # print(len(categorized_dihedral_angles.get_general()))
+    # print(len(categorized_dihedral_angles.get_gly()))
+    # print("~~~~~~~~~~~~~~~~")
+    # print(len(dihedral_angles_general))
+    # print(len(dihedral_angles_gly))
+    # print("~~~~~~~~~~~~~~~~")
+
 
     #categorized_dihedral_angles = CategorizedDihedralAngles(dihedral_angles_gly=dihedral_angles_gly, dihedral_angles_pro=dihedral_angles_pro, dihedral_angles_prepro=dihedral_angles_prepro, dihedral_angles_general=dihedral_angles_general)
 
@@ -219,10 +241,20 @@ def collect_categorized_dihedral_angles(filepath: str, b_factor_threshold: Optio
             if residue_name != "GLY" and residue_name != "PRO" and next_residue_name != "PRO":
                 dihedral_angles_general.append((phi, psi))
 
+    # print(len(categorized_dihedral_angles.get_general()))
+    # print(len(categorized_dihedral_angles.get_gly()))
+
     # print(dihedral_angles_general)
     categorized_dihedral_angles.add_to_gly(dihedral_angles_gly)
     categorized_dihedral_angles.add_to_pro(dihedral_angles_pro)
     categorized_dihedral_angles.add_to_prepro(dihedral_angles_prepro)
     categorized_dihedral_angles.add_to_general(dihedral_angles_general)
+
+
+    # print(len(dihedral_angles_general))
+    # print(len(dihedral_angles_gly))
+
+    # print(len(categorized_dihedral_angles.get_general()))
+    # print(len(categorized_dihedral_angles.get_gly()))
 
     return categorized_dihedral_angles

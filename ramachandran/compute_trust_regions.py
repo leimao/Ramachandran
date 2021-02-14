@@ -219,11 +219,13 @@ def compute_gaussian_kde_densities_from_directory(dir_path: str,
 
     # Computing Gaussian KDE
     # This is a single-thread implementation and is somewhat slow.
-    print("Computing Gaussian kernel, this might take a while...")
-    
+    print("Computing Gaussian kernel for Gly, {} samples, this might take a while...".format(len(categorized_dihedral_angles.get_gly())))
     gaussian_density_gly = compute_gaussian_kde_density(dihedral_angles=categorized_dihedral_angles.get_gly(), resolution=resolution)
+    print("Computing Gaussian kernel for Pro, {} samples, this might take a while...".format(len(categorized_dihedral_angles.get_pro())))
     gaussian_density_pro = compute_gaussian_kde_density(dihedral_angles=categorized_dihedral_angles.get_pro(), resolution=resolution)
+    print("Computing Gaussian kernel for pre-Pro, {} samples, this might take a while...".format(len(categorized_dihedral_angles.get_prepro())))
     gaussian_density_prepro = compute_gaussian_kde_density(dihedral_angles=categorized_dihedral_angles.get_prepro(), resolution=resolution)
+    print("Computing Gaussian kernel for general, {} samples, this might take a while...".format(len(categorized_dihedral_angles.get_general())))
     gaussian_density_general = compute_gaussian_kde_density(dihedral_angles=categorized_dihedral_angles.get_general(), resolution=resolution)
 
     if data_filepath is not None:

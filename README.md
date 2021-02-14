@@ -24,6 +24,12 @@ $ docker build -f docker/ramachandran.Dockerfile --no-cache --tag=ramachandran:0
 $ docker run -it --rm --gpus device=0 -v $(pwd):/mnt ramachandran:0.0.1
 ```
 
+### Install
+
+```
+$ pip install ramachandran
+```
+
 ## TODOs
 
 - [ ] Add PDB crawling tool to compute the favorable and acceptable regions.
