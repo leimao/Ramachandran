@@ -4,7 +4,7 @@ Ramachandran plot visualizes energetically allowed regions for backbone dihedral
 
 ## Dependencies
 
-* Python 3.5+
+* Python 3.8+
 * Numpy 1.20.1+
 * Matplotlib 3.3.4+
 
