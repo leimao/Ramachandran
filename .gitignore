@@ -5,3 +5,5 @@ pdb_collections
 pdbx_collections
 pdbx_collections*
 archive
+build
+dist
