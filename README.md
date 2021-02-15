@@ -25,7 +25,7 @@ $ docker build -f docker/ramachandran.Dockerfile --no-cache --tag=ramachandran:0
 $ docker run -it --rm --gpus device=0 -v $(pwd):/mnt ramachandran:0.0.1
 ```
 
-### Install
+### Install Package
 
 ```
 $ pip install ramachandran
