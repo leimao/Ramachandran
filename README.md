@@ -1,11 +1,12 @@
 # Ramachandran
 
-Ramachandran plot visualizes energetically allowed regions for backbone dihedral angles ψ against φ of amino acid residues in protein structure. This Python package provides the implementations to crawling PDB/PDBx files from RCSB PDB Bank, parse PDB/PDBx files to extract geometric information, computing the torsion angles of residues from atom coordinates and the Ramachandran favorable regions from the reference PDB/PDBx files selected, and creating Ramachandran plots for user-provided PDB/PDBx files.
+Ramachandran plot visualizes energetically allowed regions for backbone torsion (dihedral) angles ψ against φ of amino acid residues in protein structure. This Python package provides the implementations from scratch to crawling PDB/PDBx files from RCSB PDB Bank, parsing PDB/PDBx files for extracting geometric information, computing the torsion angles of residues from atom coordinates and the Ramachandran favorable regions from the reference PDB/PDBx files selected, and creating Ramachandran plots for user-provided PDB/PDBx files.
 
 ## Dependencies
 
 * Python 3.8+
 * Numpy 1.20.1+
+* Scipy 1.6.0+
 * Matplotlib 3.3.4+
 
 ## Usages
@@ -33,8 +34,8 @@ $ pip install ramachandran
 ### Create Ramachandran Plots
 
 ```
-$ ramachandran_plot --help
-usage: ramachandran_plot [-h] --file-path FILE_PATH
+$ ramachandran-plot --help
+usage: ramachandran-plot [-h] --file-path FILE_PATH
                          [--save-dir-path SAVE_DIR_PATH]
                          [--protein-name PROTEIN_NAME]
 
@@ -58,8 +59,14 @@ optional arguments:
 $ ramachandran_plot --file-path 1AXC.cif --save-dir-path 1AXC --protein-name 1AXC
 ```
 
-![1AXC](./demo/1AXC/general.svg)
+|              General             |              GLY             |              PRO             |             Pre-PRO             |
+|:--------------------------------:|:----------------------------:|:----------------------------:|:-------------------------------:|
+| ![1AXC](./demo/1AXC/general.svg) | ![1AXC](./demo/1AXC/gly.svg) | ![1AXC](./demo/1AXC/pro.svg) | ![1AXC](./demo/1AXC/prepro.svg) |
 
+## TODO
+
+- [ ] Filter homologous proteins for computing the Ramachandran statistics, since too many homologous protein structures will bias the statistics.
+- [ ] Add the [original hard-coded Ramachandran favorable region](https://pubmed.ncbi.nlm.nih.gov/4882249/).
 
 ## References
 
