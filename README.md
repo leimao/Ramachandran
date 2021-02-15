@@ -30,7 +30,7 @@ $ docker run -it --rm --gpus device=0 -v $(pwd):/mnt ramachandran:0.0.1
 $ pip install ramachandran
 ```
 
-### Create Ramachandran Plot
+### Create Ramachandran Plots
 
 ```
 $ ramachandran_plot --help
@@ -38,7 +38,8 @@ usage: ramachandran_plot [-h] --file-path FILE_PATH
                          [--save-dir-path SAVE_DIR_PATH]
                          [--protein-name PROTEIN_NAME]
 
-Ramachandran Plot Tool.
+Ramachandran Plot Tool. Plots for GLY, PRO, pre-PRO, and Other residues will
+be created.
 
 optional arguments:
   -h, --help            show this help message and exit
