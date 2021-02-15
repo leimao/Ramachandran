@@ -1,6 +1,6 @@
 # Ramachandran
 
-Ramachandran plot visualizes energetically allowed regions for backbone torsion (dihedral) angles ψ against φ of amino acid residues in protein structure. This Python package provides the implementations from scratch to crawling PDB/PDBx files from RCSB PDB Bank, parsing PDB/PDBx files for extracting geometric information, computing the torsion angles of residues from atom coordinates and the Ramachandran favorable regions from the reference PDB/PDBx files selected, and creating Ramachandran plots for user-provided PDB/PDBx files.
+Ramachandran plot visualizes energetically allowed regions for backbone torsion (dihedral) angles ψ against φ of amino acid residues in protein structure. This Python package provides the implementations from scratch to crawling PDB/PDBx files from RCSB PDB Bank, parsing PDB/PDBx files for extracting geometric information, computing the torsion angles of residues from atom coordinates, analyzing the Ramachandran favorable regions from the reference PDB/PDBx files selected, and creating Ramachandran plots for user-provided PDB/PDBx files.
 
 ## Dependencies
 
