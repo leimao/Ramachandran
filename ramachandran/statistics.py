@@ -40,7 +40,7 @@ def count_torsion_angles(phi_psi_angles: List[Tuple[float, float]],
         counts[i, j] += 1
 
     if normalized == True:
-        counts = counts / np.sum(counts)
+        counts = counts.astype(np.float32) / np.sum(counts)
 
     return counts
 
@@ -181,6 +181,11 @@ def compute_gaussian_kde_densities_from_directory(
         .format(len(phi_psi_angles)))
     gaussian_density_general = compute_gaussian_kde_density(
         phi_psi_angles=phi_psi_angles, resolution=resolution)
+
+    # print(np.sum(gaussian_density_gly))
+    # print(np.sum(gaussian_density_pro))
+    # print(np.sum(gaussian_density_prepro))
+    # print(np.sum(gaussian_density_general))
 
     if save_file_path is not None:
 

@@ -12,15 +12,15 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/leimao/Ramachandran",
-    #packages=setuptools.find_packages(),
+    # packages=setuptools.find_packages(),
     packages=["ramachandran"],
     package_dir={"ramachandran": "ramachandran"},
     package_data={"ramachandran": ["data/*.npz"]},
-    #package_data={"ramachandran": ["data/*"]},
+    scripts=["scripts/ramachandran_plot"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.5',
+    python_requires='>=3.8',
 )

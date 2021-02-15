@@ -1,6 +1,6 @@
 # Ramachandran
 
-Ramachandran plot visualizes energetically allowed regions for backbone dihedral angles ψ against φ of amino acid residues in protein structure.
+Ramachandran plot visualizes energetically allowed regions for backbone dihedral angles ψ against φ of amino acid residues in protein structure. This Python package provides the implementations to crawling PDB/PDBx files from RCSB PDB Bank, parse PDB/PDBx files to extract geometric information, computing the torsion angles of residues from atom coordinates and the Ramachandran favorable regions from the reference PDB/PDBx files selected, and creating Ramachandran plots for user-provided PDB/PDBx files.
 
 ## Dependencies
 
@@ -30,19 +30,37 @@ $ docker run -it --rm --gpus device=0 -v $(pwd):/mnt ramachandran:0.0.1
 $ pip install ramachandran
 ```
 
-## TODOs
+### Create Ramachandran Plot
 
-- [ ] Add PDB crawling tool to compute the favorable and acceptable regions.
-- [ ] Add favorable and acceptable regions to the plot.
-- [ ] Add mixture of Gaussians for visualizing the clusters of the dihedral angles.
-- [ ] Allow the user to show residue name and number in the plot.
+```
+$ ramachandran_plot --help
+usage: ramachandran_plot [-h] --file-path FILE_PATH
+                         [--save-dir-path SAVE_DIR_PATH]
+                         [--protein-name PROTEIN_NAME]
 
-## FAQs
+Ramachandran Plot Tool.
 
-### Feature Requests
+optional arguments:
+  -h, --help            show this help message and exit
+  --file-path FILE_PATH
+                        PDB/PDBx file path. (default: None)
+  --save-dir-path SAVE_DIR_PATH
+                        Directory path for saving the Ramachandran plots for
+                        the PDB/PDBx file. (default: .)
+  --protein-name PROTEIN_NAME
+                        Protein name. (default: None)
+```
 
-Please post feature requests on GitHub Issues.
+## Demo
+
+```
+$ ramachandran_plot --file-path 1AXC.cif --save-dir-path 1AXC --protein-name 1AXC
+```
+
+![1AXC](./demo/1AXC/general.svg)
+
 
 ## References
 
 * [Ramachandran Plot](https://en.wikipedia.org/wiki/Ramachandran_plot)
+* [PyRAMA](https://github.com/gerdos/PyRAMA)

@@ -1,0 +1,33 @@
+#!/usr/bin/python3
+
+import argparse
+import ramachandran.plot
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(
+        description="Ramachandran Plot Tool.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    
+    parser.add_argument("--file-path",
+                        type=str,
+                        help="PDB/PDBx file path.",
+                        required=True)
+
+    parser.add_argument("--save-dir-path",
+                        type=str,
+                        help="Directory path for saving the Ramachandran plots for the PDB/PDBx file.",
+                        default=".")
+
+    parser.add_argument("--protein-name",
+                        type=str,
+                        help="Protein name.",
+                        default=None)
+
+    argv = parser.parse_args()
+
+    file_path = argv.file_path
+    save_dir_path = argv.save_dir_path
+    protein_name = argv.protein_name
+
+    ramachandran.plot.create_ramachandran_plots_from_file(file_path=file_path, save_dir_path=save_dir_path, protein_name=protein_name)
